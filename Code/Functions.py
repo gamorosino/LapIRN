@@ -43,11 +43,16 @@ def transform_unit_flow_to_flow_cuda(flow):
     return flow
 
 
-def load_4D(name):
+def load_4D(name,get_info=False):
     X = nib.load(name)
+    H = X.header
+    A = X.affine
     X = X.get_fdata()
     X = np.reshape(X, (1,) + X.shape)
-    return X
+    if get_info:         
+        return X, H, A
+    else:
+        return X
 
 
 def load_5D(name):
@@ -82,11 +87,9 @@ def save_img_nii(I_img, savename):
 
 
 def save_flow(I_img,savename,header=None,affine=None):
-    if header is None or affine is None:
+    if affine is None:
         affine = np.diag([1, 1, 1, 1])
-        new_img = nib.nifti1.Nifti1Image(I_img, affine, header=None)
-    else:
-        new_img = nib.nifti1.Nifti1Image(I_img, affine, header=header)
+    new_img = nib.nifti1.Nifti1Image(I_img, affine, header=header)
 
     nib.save(new_img, savename)
 
